@@ -1,4 +1,5 @@
 const cluster = require('cluster');
+const crypto = require('crypto');
 const express = require('express');
 const app = express();
 
@@ -9,17 +10,14 @@ if(cluster.isMaster) {
   // Cause index.js to be executed again but in child mode
   cluster.fork()
   cluster.fork()
-}else{
-
-  // child process
-  function doWork(duration){
-    const staet = Date.now();
-    while(Date.now() - staet < duration){}
-  }
+  cluster.fork()
+  cluster.fork()
+}else{ // child process
   
   app.get('/', (req, res) => {
-    doWork(5000);
-    res.send('Hi there');
+    crypto.pbkdf2('a', 'b', 100000, 512, 'sha512', ()=> {
+      res.send('Hi there');
+    })
   })
 
   app.get('/fast', (req, res) => {
